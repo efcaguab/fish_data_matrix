@@ -1,5 +1,13 @@
+# get data from BioOracle for the GPS fixes in `locations.csv` outputs
+# 'locations.rds' with details about the study sites and `env_data.rds` with the
+# raw environmental data from BioOracle. Rows are in same order as in env_data.rds
+
 library(magrittr)
 library(ggplot2)
+library(dplyr)
+library(SDMTools)
+library(stringr)
+library(plyr)
 
 # read data
 
@@ -40,50 +48,3 @@ data %<>%
 saveRDS(locations, file = "data/processed/locations.rds", ascii = T, compress = F)
 saveRDS(data, file = "data/processed/env_data.rds", ascii = T, compress = F)
 
-
-# log transform
-log_data <- data %>%
-	lapply(log) %>%
-	as.data.frame()
-# scale
-
-scaled_data <- log_data %>%
-	lapply(scale) %>%
-	as.data.frame()
-
-# have a look at the raw data
-log_data %>%
-	tidyr::gather("variable", "value") %>%
-	ggplot(aes(x = value)) +
-	geom_histogram(bins = 8) +
-	facet_wrap(~ variable, scales = "free")
-
-# correlation matrix
-
-cor.mtest <- function(mat, conf.level = 0.95){
-	mat <- as.matrix(mat)
-	n <- ncol(mat)
-	p.mat <- lowCI.mat <- uppCI.mat <- matrix(NA, n, n)
-	diag(p.mat) <- 0
-	diag(lowCI.mat) <- diag(uppCI.mat) <- 1
-	for(i in 1:(n-1)){
-		for(j in (i+1):n){
-			tmp <- cor.test(mat[,i], mat[,j], conf.level = conf.level)
-			p.mat[i,j] <- p.mat[j,i] <- tmp$p.value
-			lowCI.mat[i,j] <- lowCI.mat[j,i] <- tmp$conf.int[1]
-			uppCI.mat[i,j] <- uppCI.mat[j,i] <- tmp$conf.int[2]
-		}
-	}
-	return(list(p.mat, lowCI.mat, uppCI.mat))
-}
-
-res1 <- cor.mtest(scaled_data,0.95)
-corrplot::corrplot(cor(scaled_data), p.mat = res1[[1]], 
-									 sig.level=0.05, 
-									 order = "hclust",
-									 method = "number")
-
-# pca
-pca <- prcomp(log_data, center = T, scale = T)
-summary(pca)
-biplot(pca)
