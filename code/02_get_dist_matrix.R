@@ -1,4 +1,12 @@
+# read the data in 'locations.csv' and calculates a distance matrix between GPS 
+# fixes output is 'dist_matrix.rds' which is populated with a 'cost' which is 
+# directly proportional to length of the shortest path that doesn't runs on land
+# between two points to illustrate the results there is one plot that shows the
+# distance from point #1 to all possible locations in the grid
+
 library(raster)
+library(SDMTools)
+library(gdistance)
 
 # read locations
 locations <- readRDS("data/processed/locations.rds")
@@ -30,6 +38,7 @@ d[] <- replace(d[], d[] > 6e6, NA)
 plot(d)
 
 # get distance matrix
-dist_matrix <- costDistance(tran, as.matrix(locations[, c("x", "y")]))
+dist_matrix <- costDistance(tran, as.matrix(locations[, c("x", "y")])) %>% 
+	as.matrix()
 	
-saveRDS(dist_matrix, file = "data/processed/distance_matrix.rds", compress =  F)
+saveRDS(dist_matrix, file = "data/processed/distance_matrix.rds", compress =  F, ascii = T)
