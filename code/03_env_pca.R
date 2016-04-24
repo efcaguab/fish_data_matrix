@@ -54,3 +54,5 @@ corrplot::corrplot(cor(scaled_data), p.mat = res1[[1]],
 pca <- prcomp(log_data, center = T, scale = T)
 summary(pca)
 biplot(pca)
+
+saveRDS(pca, file = "data/processed/env_pca.rds", ascii = T, compress = F)
