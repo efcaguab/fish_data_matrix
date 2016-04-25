@@ -19,7 +19,7 @@ scaled_data <- log_data %>%
 	as.data.frame()
 
 # have a look at the raw data
-log_data %>%
+data %>%
 	tidyr::gather("variable", "value") %>%
 	ggplot(aes(x = value)) +
 	geom_histogram(bins = 8) +
