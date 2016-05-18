@@ -16,11 +16,22 @@ ras <- SDMTools::read.asc("data/raw/BioOracle_7070RV/calcite.asc") %>%
 	SDMTools::raster.from.asc() %>%
 	raster::`crs<-`("+proj=longlat +datum=WGS84")
 
+# frame the thingy
+limits <- locations %>%
+	lapply(function(x) c(floor(min(x$x)-2),
+											 ceiling(max(x$x)+2),
+											 floor(min(x$y)-2),
+											 ceiling(max(x$y)+2)))
+
+limits <- do.call(rbind, limits)
+limits <- c(min(limits[,1])-2, 
+						max(limits[,2])+2, 
+						min(limits[,3])-2,
+						max(limits[,4])+2)
+
+# crop raster
 ras %<>% 
-	raster::crop(raster::extent(c(floor(min(locations$x)-2),
-																ceiling(max(locations$x)+2),
-																floor(min(locations$y)-2),
-																ceiling(max(locations$y)+2))))
+	raster::crop(raster::extent(limits))
 land_mask <- ras
 
 ras[] <- !is.na(ras[])
@@ -32,13 +43,13 @@ tran <- ras %>%
 	gdistance::geoCorrection(type = "c")
 
 # get distance from the first point for ilustration
-d <- gdistance::accCost(tran, as.matrix(locations[c(1), c("x", "y")])) %>%
+d <- gdistance::accCost(tran, as.matrix(locations[[1]][c(1), c("x", "y")])) %>%
 	mask(land_mask)
 d[] <- replace(d[], d[] > 6e6, NA)
 plot(d)
 
-# get distance matrix
-dist_matrix <- costDistance(tran, as.matrix(locations[, c("x", "y")])) %>% 
-	as.matrix()
+# get distance matrices
+dist_matrix <- lapply(locations, function(x) costDistance(tran, as.matrix(x[, c("x", "y")]))) %>%
+	lapply(as.matrix)
 	
 saveRDS(dist_matrix, file = "data/processed/distance_matrix.rds", compress =  F, ascii = T)
