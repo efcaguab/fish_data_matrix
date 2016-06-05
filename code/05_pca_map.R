@@ -19,7 +19,8 @@ raster_names <- list.files(folder) %>%
 env_data <- SDMTools::asc2dataframe(raster, raster_names) %>% 
 	dplyr::tbl_df()
 
-locations <- readRDS("data/processed/locations.rds")
+env_pca <- readRDS("data/processed/env_pca.rds")
+locations <- env_pca$coord
 
 # subset env_data
 sub_env_data <- env_data %>%
@@ -33,17 +34,15 @@ sub_env_data <- env_data %>%
 coord <- sub_env_data %>%
 	dplyr::select(x, y)
 	
-
 pca_values <- sub_env_data %>%
 	dplyr::select(calcite:sstrange) %>% 
 	lapply(log) %>%
 	as.data.frame() %>%
-	prcomp(center = T, scale = T) %$%
-	x %>% as.data.frame()
+	predict(env_pca$pca, newdata = .) %>%
+	as.data.frame()
 
 sub_env_data %<>%
 	dplyr::bind_cols(pca_values)
-
 
 sub_env_data %>%
 	dplyr::select(x, y, PC2:PC3) %>%

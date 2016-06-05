@@ -31,7 +31,6 @@ nam <- "./data/raw/species" %>%
 	stringr::str_sub(end = -5)
 
 names(species) <- nam
-locations <- read.csv("data/raw/locations.csv")
 
 env_data_filtered <- lapply(species, function(x){
 	env_data %>%
