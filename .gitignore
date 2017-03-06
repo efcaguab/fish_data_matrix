@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+data/raw/\.DS_Store
+
+data/processed/\.DS_Store
+
+data/\.DS_Store
+
+\.DS_Store
