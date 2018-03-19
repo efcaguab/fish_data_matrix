@@ -108,7 +108,7 @@ plot_axis <- function(axis, w, h, labels = F){
 					axis.ticks = element_line(size = 0.3),
 					axis.ticks.length=unit(-0.2, "lines")) +
 		guides(fill = guide_colorbar(barwidth = unit(0.5, "lines"), 
-																 barheight = unit(10, "lines"))) +
+																 barheight = unit(12, "lines"))) +
 		xlab("longitude") +
 		ylab("latitude") + 
 		coord_quickmap()
@@ -124,6 +124,22 @@ p
 point <- cbind(env_pca$env_data, env_pca$pca$x) %>% 
 	dplyr::filter(name != c("Bay_de_Ghoubett"))
 
+loading_plot_theme <- theme_bw() +
+	theme(
+				# panel.grid = element_blank(), 
+				panel.background = element_rect(fill = "white"), 
+				axis.title = element_text(size = 6, 
+																	margin = unit(0, "lines")),
+				panel.border = element_rect(colour = "black", fill = NA),
+				axis.text.x = element_text(size = 5),
+				axis.text.y = element_text(size = 5),
+				legend.text = element_text(size = 5),
+				legend.margin = margin(),
+				legend.key.width = unit(0.5, "lines"),
+				axis.ticks = element_line(size = 0.3)
+				# axis.ticks.length=unit(-0.2, "lines")
+				)
+
 p4 <- autoplot(env_pca$pca, 
 				 loadings = T, 
 				 alpha = 0,
@@ -137,21 +153,7 @@ p4 <- autoplot(env_pca$pca,
 				 loadings.label.repel = F,
 				 loadings.label.colour = "grey30",
 				 x = 1,
-				 y = 2) + theme_bw() +
-	theme(panel.grid = element_blank(), 
-				panel.background = element_rect(fill = "white"), 
-				axis.title = element_text(size = 6, 
-																	margin = unit(0, "lines")),
-				panel.border = element_rect(colour = "black", fill = NA),
-				axis.text.x = element_text(size = 5, margin = unit(rep(1,4), "lines")),
-				axis.text.y = element_text(size = 5, 
-																	 margin = unit(rep(2,4), "lines"),
-																	 hjust = 0),
-				legend.text = element_text(size = 5),
-				legend.margin = margin(),
-				legend.key.width = unit(0.5, "lines"),
-				axis.ticks = element_line(size = 0.3),
-				axis.ticks.length=unit(-0.2, "lines")) +
+				 y = 2) + 
 	geom_point(data = point,
 						 aes(x = scales::rescale(PC1, to = c(-0.25, 0.25)),
 						 		y = scales::rescale(PC2, to = c(-0.25, 0.25))),
@@ -163,7 +165,8 @@ p4 <- autoplot(env_pca$pca,
 											y = scales::rescale(PC2, to = c(-0.25, 0.25)),
 											label = gsub("_", " ", 1:length(name))),
 									size = 2,
-									colour = "black")
+									colour = "black") +
+	loading_plot_theme
 
 # ggsave("loadings_PC1PC2.pdf", width = 3.5, height = 2.45)
 
@@ -180,23 +183,7 @@ p5 <- autoplot(env_pca$pca,
 				 loadings.label.repel = F,
 				 loadings.label.colour = "grey30",
 				 x = 2,
-				 y = 3) + theme_bw() +
-	theme(
-		# panel.grid = element_blank(), 
-				panel.background = element_rect(fill = "white"), 
-				axis.title = element_text(size = 6, 
-																	margin = unit(0, "lines")),
-				panel.border = element_rect(colour = "black", fill = NA),
-				axis.text.x = element_text(size = 5, margin = unit(rep(1,4), "lines")),
-				axis.text.y = element_text(size = 5, 
-																	 margin = unit(rep(2,4), "lines"),
-																	 hjust = 0),
-				legend.text = element_text(size = 5),
-				legend.margin = margin(),
-				legend.key.width = unit(0.5, "lines"),
-				axis.ticks = element_line(size = 0.3)
-				# axis.ticks.length=unit(-0.2, "lines")
-				) +
+				 y = 3) +
 	geom_point(data = point,
 						 aes(x = scales::rescale(PC2, to = c(-0.25, 0.25)),
 						 		y = scales::rescale(PC3, to = c(-0.25, 0.25))),
@@ -208,7 +195,8 @@ p5 <- autoplot(env_pca$pca,
 											y = scales::rescale(PC3, to = c(-0.25, 0.25)),
 											label = gsub("_", " ", 1:length(name))),
 									size = 2,
-									colour = "black")
+									colour = "black") +
+	loading_plot_theme
 
 # ggsave("loadings_PC2PC3.pdf", width = 3.5, height = 2.45)
 
@@ -223,24 +211,28 @@ p2_p3 <- cowplot::plot_grid(p2, p3,
 														labels = c("(b)", "(c)"), 
 														label_size = 8, 
 														label_fontface = "plain", 
-														label_y = 0.24, 
+														label_y = 0.26, 
 														label_x = 0.01)
+
 p1_p2_p3 <- cowplot::plot_grid(p1 + theme(legend.position = "none"),
 															 p2_p3, 
 															 leg, 
-															 ncol = 3, rel_widths = c(2, 1, 0.15), 
+															 ncol = 3, rel_widths = c(2.1, 1, 0.15), 
 															 labels = c("(a)"), 
 															 label_fontface = "plain", 
 															 label_size = 8, 
-															 label_y = 0.14, 
-															 label_x = 0.01)
+															 label_y = 0.13, 
+															 label_x = 0.01,
+															 align = "hv")
 
 p4_p5 <- cowplot::plot_grid(p4, p5, ncol = 2,
 														labels = c("(d)", "(e)"), 
 														label_fontface = "plain", 
 														label_size = 8, 
-														label_y = 0.14, 
-														label_x = 0.01)
+														label_y = 0.25, 
+														label_x = 0.13)
 
-p <- cowplot::plot_grid(p1_p2_p3, p4_p5, ncol = 1, rel_heights = c(1.7,1))
-cowplot::ggsave("fig5.pdf", p, width = 7, height = 6)
+p <- cowplot::plot_grid(p1_p2_p3, p4_p5, ncol = 1, 
+												rel_heights = c(1.7,1), 
+												align = "hv")
+cowplot::ggsave("fig3.pdf", p, width = 7, height = 6)
