@@ -241,3 +241,6 @@ p4_p5 <- cowplot::plot_grid(p4, p5, ncol = 2,
 														label_size = 8, 
 														label_y = 0.14, 
 														label_x = 0.01)
+
+p <- cowplot::plot_grid(p1_p2_p3, p4_p5, ncol = 1, rel_heights = c(1.7,1))
+cowplot::ggsave("fig5.pdf", p, width = 7, height = 6)
