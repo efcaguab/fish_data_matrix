@@ -102,21 +102,22 @@ plot_axis <- function(axis, w, h, labels = F){
 																		 hjust = 0),
 					legend.text = element_text(size = 5),
 					legend.margin = margin(),
-					legend.key.width = unit(0.5, "lines"),
+					legend.position = "right",
+					# legend.key.width = unit(0.5, "lines"),
+					# legend.key.height = unit(0.5, "lines"),
 					axis.ticks = element_line(size = 0.3),
 					axis.ticks.length=unit(-0.2, "lines")) +
+		guides(fill = guide_colorbar(barwidth = unit(0.5, "lines"), 
+																 barheight = unit(10, "lines"))) +
 		xlab("longitude") +
 		ylab("latitude") + 
 		coord_quickmap()
 	
-
+p
 	
-	ggsave(paste0(axis, ".pdf"), p, width = w, height = h)
+	# ggsave(paste0(axis, ".pdf"), p, width = w, height = h)
 }
 
-plot_axis("PC1", 7, 3.25, labels = T)
-plot_axis("PC2", 3.5, 2.45)
-plot_axis("PC3", 3.5, 2.45)
 
 point <- cbind(env_pca$env_data, env_pca$pca$x) %>% 
 	dplyr::filter(name != c("Bay_de_Ghoubett"))
@@ -207,3 +208,24 @@ autoplot(env_pca$pca,
 
 ggsave("loadings_PC2PC3.pdf", width = 3.5, height = 2.45)
 
+p1 <- plot_axis("PC1", 7, 3.25, labels = T)
+leg <- cowplot::get_legend(p1)
+p2 <- plot_axis("PC2", 3.5, 2.45) + theme(legend.position = "none")
+p3 <- plot_axis("PC3", 3.5, 2.45) + theme(legend.position = "none")
+
+p2_p3 <- cowplot::plot_grid(p2, p3, 
+														ncol = 1, 
+														labels = c("(b)", "(c)"), 
+														label_size = 8, 
+														label_fontface = "plain", 
+														label_y = 0.24, 
+														label_x = 0.01)
+p1_p2_p3 <- cowplot::plot_grid(p1 + theme(legend.position = "none"),
+															 p2_p3, 
+															 leg, 
+															 ncol = 3, rel_widths = c(2, 1, 0.15), 
+															 labels = c("(a)"), 
+															 label_fontface = "plain", 
+															 label_size = 8, 
+															 label_y = 0.14, 
+															 label_x = 0.01)
