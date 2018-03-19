@@ -119,10 +119,12 @@ p
 }
 
 
+# loading plots
+
 point <- cbind(env_pca$env_data, env_pca$pca$x) %>% 
 	dplyr::filter(name != c("Bay_de_Ghoubett"))
 
-autoplot(env_pca$pca, 
+p4 <- autoplot(env_pca$pca, 
 				 loadings = T, 
 				 alpha = 0,
 				 # label = T,
@@ -163,9 +165,9 @@ autoplot(env_pca$pca,
 									size = 2,
 									colour = "black")
 
-ggsave("loadings_PC1PC2.pdf", width = 3.5, height = 2.45)
+# ggsave("loadings_PC1PC2.pdf", width = 3.5, height = 2.45)
 
-autoplot(env_pca$pca, 
+p5 <- autoplot(env_pca$pca, 
 				 loadings = T, 
 				 alpha = 0,
 				 # label = T,
@@ -179,7 +181,8 @@ autoplot(env_pca$pca,
 				 loadings.label.colour = "grey30",
 				 x = 2,
 				 y = 3) + theme_bw() +
-	theme(panel.grid = element_blank(), 
+	theme(
+		# panel.grid = element_blank(), 
 				panel.background = element_rect(fill = "white"), 
 				axis.title = element_text(size = 6, 
 																	margin = unit(0, "lines")),
@@ -191,8 +194,9 @@ autoplot(env_pca$pca,
 				legend.text = element_text(size = 5),
 				legend.margin = margin(),
 				legend.key.width = unit(0.5, "lines"),
-				axis.ticks = element_line(size = 0.3),
-				axis.ticks.length=unit(-0.2, "lines")) +
+				axis.ticks = element_line(size = 0.3)
+				# axis.ticks.length=unit(-0.2, "lines")
+				) +
 	geom_point(data = point,
 						 aes(x = scales::rescale(PC2, to = c(-0.25, 0.25)),
 						 		y = scales::rescale(PC3, to = c(-0.25, 0.25))),
@@ -206,7 +210,8 @@ autoplot(env_pca$pca,
 									size = 2,
 									colour = "black")
 
-ggsave("loadings_PC2PC3.pdf", width = 3.5, height = 2.45)
+# ggsave("loadings_PC2PC3.pdf", width = 3.5, height = 2.45)
+
 
 p1 <- plot_axis("PC1", 7, 3.25, labels = T)
 leg <- cowplot::get_legend(p1)
@@ -229,3 +234,10 @@ p1_p2_p3 <- cowplot::plot_grid(p1 + theme(legend.position = "none"),
 															 label_size = 8, 
 															 label_y = 0.14, 
 															 label_x = 0.01)
+
+p4_p5 <- cowplot::plot_grid(p4, p5, ncol = 2,
+														labels = c("(d)", "(e)"), 
+														label_fontface = "plain", 
+														label_size = 8, 
+														label_y = 0.14, 
+														label_x = 0.01)
